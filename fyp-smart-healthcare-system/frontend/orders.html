@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Medicine Orders - Admin</title>
+  <style>
+    body { font-family: Arial, sans-serif; width: 100%; }
+    h1 { text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #05458a; color: white; }
+    .delete-btn {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 6px 14px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: background 0.2s;
+    }
+    .delete-btn:hover {
+      background-color: #b52a37;
+    }
+  </style>
+</head>
+<body>
+  <h1>Medicine Orders</h1>
+  <table id="ordersTable">
+    <thead>
+      <tr>
+        <th>Medicine</th>
+        <th>Quantity</th>
+        <th>Customer</th>
+        <th>Phone</th>
+        <th>Address</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Orders will be injected here -->
+    </tbody>
+  </table>
+
+  <script>
+    // Authentication check: redirect to login if not logged in
+    if (!localStorage.getItem('token')) {
+      window.location.href = 'auth.html';
+    }
+
+    async function fetchOrders() {
+      try {
+        const response = await fetch("http://localhost:3000/pharmacy/orders");
+        const data = await response.json();
+
+        if (response.ok) {
+          const tableBody = document.querySelector("#ordersTable tbody");
+          tableBody.innerHTML = "";
+
+          data.forEach(order => {
+            const row = document.createElement("tr");
+            let dateStr = '-';
+            if (order.createdAt) {
+              const d = new Date(order.createdAt);
+              if (!isNaN(d.getTime())) {
+                dateStr = d.toLocaleDateString();
+              }
+            }
+            row.innerHTML = `
+              <td>${order.medicineName}</td>
+              <td>${order.quantity}</td>
+              <td>${order.customerName}</td>
+              <td>${order.phone}</td>
+              <td>${order.address}</td>
+              <td><button class="delete-btn" onclick="deleteOrder('${order._id}')">Delete</button></td>
+            `;
+            tableBody.appendChild(row);
+          });
+        } else {
+          alert("Failed to fetch orders.");
+        }
+      } catch (error) {
+        alert("Error: " + error.message);
+      }
+    }
+
+    async function deleteOrder(orderId) {
+      if (!confirm('Are you sure you want to delete this order?')) return;
+      try {
+        const response = await fetch(`http://localhost:3000/pharmacy/orders/${orderId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+          }
+        });
+        if (response.ok) {
+          fetchOrders();
+        } else {
+          alert('Failed to delete order.');
+        }
+      } catch (error) {
+        alert('Error: ' + error.message);
+      }
+    }
+
+    fetchOrders();
+  </script>
+</body>
+</html>

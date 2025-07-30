@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pharmacy - SmartCare Hospital</title>
+  <link rel="stylesheet" href="./css/pharmacy.css" />
+</head>
+<body>
+
+  <section class="pharmacy-container">
+    <h1 class="heading">Pharmacy <span>Stock</span></h1>
+
+    <div class="card">
+      <table id="pharmacy-stock">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Stock</th>
+            <th>Expiry</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- JS will fill this -->
+        </tbody>
+      </table>
+    </div>
+
+    <h2 class="subheading">Place <span>Order</span></h2>
+    <div class="card">
+      <form id="order-form">
+        <input type="text" id="medicine-name" placeholder="Medicine Name" required />
+        <input type="number" id="quantity" placeholder="Quantity" required />
+        <input type="text" id="customer-name" placeholder="Your Name" required />
+        <input type="tel" id="phone" placeholder="Phone Number" required />
+         <input type="date" name="date" required />
+        <textarea id="address" placeholder="Address" required></textarea>
+        <button type="submit">Place Order</button>
+      </form>
+    </div>
+  </section>
+
+  <script src="./js/pharmacy.js" defer></script>
+</body>
+</html>

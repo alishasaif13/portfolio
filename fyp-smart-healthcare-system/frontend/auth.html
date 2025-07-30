@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SmartCare | Login & Signup</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #b0cff1, #93d1e2);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: #fff;
+    }
+
+    .auth-container {
+      background-color: #ffffff;
+      color: #333;
+      padding: 30px 40px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #007BFF;
+    }
+
+    form {
+      display: none;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    p {
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    a {
+      color: #007BFF;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <h2 id="formTitle">Sign Up</h2>
+
+    <!-- Sign Up Form -->
+    <form id="signupForm">
+      <input type="text" name="name" placeholder="Full Name" required />
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Password" required />
+      <button type="submit">Register</button>
+    </form>
+
+    <!-- Login Form -->
+    <form id="loginForm">
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
+
+    <p id="toggleText">
+      Already have an account? <a href="#" onclick="toggleForm()">Login</a>
+    </p>
+  </div>
+
+  <script>
+    const signupForm = document.getElementById('signupForm');
+    const loginForm = document.getElementById('loginForm');
+    const formTitle = document.getElementById('formTitle');
+    const toggleText = document.getElementById('toggleText');
+
+    // Show signup form by default
+    signupForm.style.display = 'block';
+
+    function toggleForm() {
+      if (signupForm.style.display === 'none') {
+        signupForm.style.display = 'block';
+        loginForm.style.display = 'none';
+        formTitle.innerText = 'Sign Up';
+        toggleText.innerHTML = `Already have an account? <a href="#" onclick="toggleForm()">Login</a>`;
+      } else {
+        signupForm.style.display = 'none';
+        loginForm.style.display = 'block';
+        formTitle.innerText = 'Login';
+        toggleText.innerHTML = `New here? <a href="#" onclick="toggleForm()">Sign Up</a>`;
+      }
+    }
+
+    signupForm.onsubmit = async (e) => {
+      e.preventDefault();
+      
+      // Show loading state
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Signing up...';
+      submitBtn.disabled = true;
+      
+      const data = Object.fromEntries(new FormData(signupForm));
+      try {
+      const res = await fetch('/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      if (res.ok) {
+        window.location.href = result.role === 'admin' ? '/dashboard.html' : '/index.html';
+      } else {
+        alert(result.message || 'Signup failed');
+        }
+      } catch (err) {
+        alert('Network error. Please try again.');
+      } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }
+    };
+
+    loginForm.onsubmit = async (e) => {
+      e.preventDefault();
+      
+      // Show loading state
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Logging in...';
+      submitBtn.disabled = true;
+      
+      const data = Object.fromEntries(new FormData(loginForm));
+      try {
+      const res = await fetch('/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      if (res.ok) {
+        window.location.href = result.role === 'admin' ? '/dashboard.html' : '/index.html';
+      } else {
+        alert(result.message || 'Login failed');
+      }
+      } catch (err) {
+        alert('Network error. Please try again.');
+      } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
+    };
+  </script>
+</body>
+</html>

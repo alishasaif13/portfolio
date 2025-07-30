@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Our Staff - SmartCare Hospital</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+    h2 {
+      text-align: center;
+      color: #004a99;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background: #004a99;
+      color: white;
+    }
+    tr:hover {
+      background: #e6f0ff;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Meet Our Staff</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Contact</th>
+        <th>Role</th>
+      </tr>
+    </thead>
+    <tbody id="staff-public-table-body"></tbody>
+  </table>
+
+  <script>
+    const API_URL = "/staff";
+    const tbody = document.getElementById("staff-public-table-body");
+
+    async function fetchStaff() {
+      try {
+        const res = await fetch(API_URL);
+        const staffList = await res.json();
+
+        tbody.innerHTML = "";
+        staffList.forEach(staff => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${staff.name}</td>
+            <td>${staff.contact}</td>
+            <td>${staff.role}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+      } catch (error) {
+        tbody.innerHTML = `<tr><td colspan="3">Failed to load staff data.</td></tr>`;
+      }
+    }
+
+    fetchStaff();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="admin-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h2>SmartCare Admin</h2>
+      <ul>
+        <li><a href="#" onclick="loadPage('dashboard-content')" class="active">Dashboard</a></li>
+        <li><a href="#" onclick="loadPage('doctors')">Doctors</a></li>
+        <li><a href="#" onclick="loadPage('patients')">Patients</a></li>
+        <li><a href="#" onclick="loadPage('staff')">Staff</a></li>
+        <li><a href="#" onclick="loadPage('pharmacy')">Pharmacy</a></li>
+        <li><a href="#" onclick="loadPage('orders')">Orders</a></li>
+        <li><a href="#" onclick="loadPage('appointments')">Appointments</a></li>
+        <li><a href="#" onclick="loadPage('payments')">Payments</a></li>
+        <li><a href="#" onclick="loadPage('contact')">Contact</a></li>
+        <li><button onclick="logout()" style="width: 100%; margin-top: 20px;">Logout</button></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div id="content-area" class="content-area">
+        <!-- Default Dashboard Content -->
+        <div id="dashboard-content">
+          <h1>Welcome to SmartCare Admin Panel</h1>
+          <p style="color: #666; margin-bottom: 30px;">Manage your hospital operations efficiently</p>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <h3>Doctors</h3>
+              <p id="doctor-count">Loading...</p>
+              <button onclick="loadPage('doctors')">View</button>
+            </div>
+            <div class="stat-card">
+              <h3>Patients</h3>
+              <p id="patient-count">Loading...</p>
+              <button onclick="loadPage('patients')">View</button>
+            </div>
+            <div class="stat-card">
+              <h3>Staff</h3>
+              <p id="staff-count">Loading...</p>
+              <button onclick="loadPage('staff')">View</button>
+            </div>
+            <div class="stat-card">
+              <h3>Appointments</h3>
+              <p id="appointment-count">Loading...</p>
+              <button onclick="loadPage('appointments')">View</button>
+            </div>
+          </div>
+
+          <h3 style="margin-top: 40px;">Quick Actions</h3>
+          <div class="quick-actions">
+            <button onclick="loadPage('doctors')" class="action-btn">Add Doctor</button>
+            <button onclick="loadPage('patients')" class="action-btn">Add Patient</button>
+            <button onclick="loadPage('staff')" class="action-btn">Add Staff</button>
+            <button onclick="loadPage('pharmacy')" class="action-btn">Manage Pharmacy</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+<script src="script.js" ></script>
+</body>
+</html>

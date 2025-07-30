@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SmartCare Patients</title>
+  <script src="patients.js" defer></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f9ff;
+      padding: 20px;
+    }
+    h1 {
+      color: #0055aa;
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #0055aa;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Patient Information</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Gender</th>
+        <th>Contact</th>
+      </tr>
+    </thead>
+    <tbody id="patient-table-body"></tbody>
+  </table>
+<script>
+  fetch('/patients')
+    .then(res => res.json())
+    .then(data => {
+      const tableBody = document.getElementById("patient-table-body");
+      tableBody.innerHTML = "";
+
+      data.forEach(patient => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${patient.name}</td>
+          <td>${patient.age}</td>
+          <td>${patient.gender}</td>
+          <td>${patient.contact}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    })
+    .catch(err => {
+      console.error("Failed to load patients:", err);
+      document.getElementById("patient-table-body").innerHTML = 
+        '<tr><td colspan="4" style="text-align: center; color: red;">Error loading patients data</td></tr>';
+    });
+</script>
+</body>
+</html>

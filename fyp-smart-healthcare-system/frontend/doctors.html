@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin Panel - Doctors Management</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+   width: 100%;
+    background: #f0f4f8;
+  }
+  h1{
+     color: #004a99;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  h2 {
+    color: white;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  form {
+    background: #fff;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  form input, form select {
+    padding: 8px;
+    flex: 1 1 180px;
+    font-size: 14px;
+  }
+  form button {
+    padding: 10px 20px;
+    background: #004a99;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  form button:hover {
+    background: #003366;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+  }
+  th, td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+  }
+  th {
+    background: #004a99;
+    color: white;
+  }
+  tr:hover {
+    background: #e6f0ff;
+  }
+  button.edit, button.delete {
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  button.edit {
+    background: #28a745;
+    color: white;
+  }
+  button.edit:hover {
+    background: #1e7e34;
+  }
+  button.delete {
+    background: #dc3545;
+    color: white;
+    margin-left: 5px;
+  }
+  button.delete:hover {
+    background: #a71d2a;
+  }
+</style>
+</head>
+<body>
+
+<h1>Doctors Management - Admin Panel</h1>
+
+<form id="doctor-form">
+  <input type="hidden" id="doctor-id" />
+  <input type="text" id="doctor-name" placeholder="Doctor Name" required />
+  <select id="doctor-gender" required>
+    <option value="" disabled selected>Select Gender</option>
+    <option value="Female">Female</option>
+    <option value="Male">Male</option>
+  </select>
+  <input type="text" id="doctor-specialization" placeholder="Specialization" required />
+  <button type="submit">Add Doctor</button>
+</form>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Gender</th>
+      <th>Specialization</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="doctors-table-body"></tbody>
+</table>
+
+<script>
+  const form = document.getElementById("doctor-form");
+  const tbody = document.getElementById("doctors-table-body");
+  const inputId = document.getElementById("doctor-id");
+  const inputName = document.getElementById("doctor-name");
+  const inputGender = document.getElementById("doctor-gender");
+  const inputSpec = document.getElementById("doctor-specialization");
+  const submitBtn = form.querySelector("button[type='submit']");
+
+  let editingId = null;
+
+  // API base URL
+  const API_URL = "http://localhost:3000/doctors";
+
+  async function fetchDoctors() {
+    try {
+      const res = await fetch(API_URL);
+      if (!res.ok) throw new Error("Failed to fetch doctors");
+      const doctors = await res.json();
+      renderTable(doctors);
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  function renderTable(doctors) {
+    tbody.innerHTML = "";
+    doctors.forEach(doc => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${doc._id}</td>
+        <td>${doc.name}</td>
+        <td>${doc.gender}</td>
+        <td>${doc.specialization}</td>
+        <td>
+          <button class="edit" onclick="editDoctor('${doc._id}')">Edit</button>
+          <button class="delete" onclick="deleteDoctor('${doc._id}')">Delete</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function resetForm() {
+    inputId.value = "";
+    inputName.value = "";
+    inputGender.value = "";
+    inputSpec.value = "";
+    submitBtn.textContent = "Add Doctor";
+    editingId = null;
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const name = inputName.value.trim();
+    const gender = inputGender.value;
+    const specialization = inputSpec.value.trim();
+
+    if (!name || !gender || !specialization) {
+      alert("Please fill all fields");
+      return;
+    }
+
+    try {
+      if (editingId) {
+        // Update doctor
+        const res = await fetch(`${API_URL}/${editingId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, gender, specialization }),
+        });
+        if (!res.ok) throw new Error("Failed to update doctor");
+        alert("Doctor updated successfully");
+      } else {
+        // Add doctor
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, gender, specialization }),
+        });
+        if (!res.ok) throw new Error("Failed to add doctor");
+        alert("Doctor added successfully");
+      }
+
+      resetForm();
+      fetchDoctors();
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+
+  window.editDoctor = async function(id) {
+    try {
+      const res = await fetch(`${API_URL}/${id}`);
+      if (!res.ok) throw new Error("Failed to fetch doctor details");
+      const doctor = await res.json();
+      inputId.value = doctor._id;
+      inputName.value = doctor.name;
+      inputGender.value = doctor.gender;
+      inputSpec.value = doctor.specialization;
+      submitBtn.textContent = "Update Doctor";
+      editingId = id;
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  window.deleteDoctor = async function(id) {
+    if (confirm("Are you sure you want to delete this doctor?")) {
+      try {
+        const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+        if (!res.ok) throw new Error("Failed to delete doctor");
+        alert("Doctor deleted successfully");
+        fetchDoctors();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+  };
+
+  // Initial load
+  fetchDoctors();
+</script>
+
+</body>
+</html>

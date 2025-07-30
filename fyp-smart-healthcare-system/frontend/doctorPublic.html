@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Doctors - SmartCare Hospital</title>
+  <style>
+    body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background-color: #f4f9ff;
+}
+
+.doctors-container {
+  padding: 40px 20px;
+  max-width: 1000px;
+  margin: auto;
+}
+
+.heading {
+  text-align: center;
+  color: #0a7cba;
+  margin-bottom: 30px;
+}
+
+.heading span {
+  color: #055d8c;
+}
+
+.card {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 0 15px rgba(0, 123, 255, 0.1);
+  margin-bottom: 40px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+}
+
+table, th, td {
+  border: 1px solid #d0e4f5;
+}
+
+th {
+  background-color: #0a7cba;
+  color: white;
+  padding: 12px;
+}
+
+td {
+  padding: 10px;
+  text-align: center;
+  background-color: #f9fcff;
+}
+
+  </style>
+</head>
+<body>
+
+  <section class="doctors-container">
+    <h1 class="heading">Our <span>Doctors</span></h1>
+
+    <div class="card">
+      <table id="doctorsTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Gender</th>
+            <th>Specialization</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- JS will fill data here -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <script>
+    async function loadDoctors() {
+      try {
+        const res = await fetch('/doctors');
+        if (!res.ok) throw new Error("Network response was not ok");
+        const doctors = await res.json();
+
+        const tbody = document.querySelector("#doctorsTable tbody");
+        tbody.innerHTML = "";
+
+        doctors.forEach(doc => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${doc.name}</td>
+            <td>${doc.gender}</td>
+            <td>${doc.specialization}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        alert("Failed to load doctors data.");
+        console.error("Doctors fetch error:", err);
+      }
+    }
+
+    loadDoctors();
+  </script>
+</body>
+</html>

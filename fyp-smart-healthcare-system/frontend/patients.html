@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Panel - Patient Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+     width: 100%;
+     
+      background: #f0f4f8;
+
+    }
+    h1{
+        color: #004a99;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    h2 {
+      color:white;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    form {
+      background: #fff;
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    form input {
+      padding: 8px;
+      flex: 1 1 180px;
+      font-size: 14px;
+    }
+    form button {
+      padding: 10px 20px;
+      background: #004a99;
+      color: white;
+      border: none;
+      cursor: pointer;
+      flex: 0 0 auto;
+    }
+    form button:hover {
+      background: #003366;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background: #004a99;
+      color: white;
+    }
+    tr:hover {
+      background: #e6f0ff;
+    }
+    button.edit, button.delete {
+      padding: 5px 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    button.edit {
+      background: #28a745;
+      color: white;
+    }
+    button.edit:hover {
+      background: #1e7e34;
+    }
+    button.delete {
+      background: #dc3545;
+      color: white;
+      margin-left: 5px;
+    }
+    button.delete:hover {
+      background: #a71d2a;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Admin Panel - Patient Management</h1>
+
+
+
+  <form id="patient-form">
+    <input type="hidden" id="patient-id" />
+    <input type="text" id="patient-name" placeholder="Full Name" required />
+    <input type="text" id="patient-age" placeholder="Age" required />
+    <input type="text" id="patient-gender" placeholder="Gender" required />
+    <input type="text" id="patient-contact" placeholder="Contact Number" required />
+    <button type="submit" id="submit-btn">Save Patient</button>
+  </form>
+
+  <table id="patient-table">
+    <thead>
+      <tr>
+        <th>Name</th><th>Age</th><th>Gender</th><th>Contact</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+ const form = document.getElementById("patient-form");
+const tableBody = document.querySelector("#patient-table tbody");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const id = document.getElementById("patient-id").value;
+  const data = {
+    name: document.getElementById("patient-name").value,
+    age: document.getElementById("patient-age").value,
+    gender: document.getElementById("patient-gender").value,
+    contact: document.getElementById("patient-contact").value
+  };
+
+  const url = id
+    ? `http://localhost:3000/api/patient/${id}`
+    : "http://localhost:3000/api/patient";
+
+  const method = id ? "PUT" : "POST";
+
+  try {
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) throw new Error(`${method} failed`);
+    form.reset();
+    document.getElementById("patient-id").value = "";
+    loadPatients();
+  } catch (err) {
+    alert(err.message);
+  }
+});
+
+async function loadPatients() {
+  const res = await fetch("http://localhost:3000/api/patient");
+  const patients = await res.json();
+
+  tableBody.innerHTML = "";
+  patients.forEach(p => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${p.name}</td>
+      <td>${p.age}</td>
+      <td>${p.gender}</td>
+      <td>${p.contact}</td>
+      <td>
+        <button onclick="editPatient('${p._id}')">Edit</button>
+        <button onclick="deletePatient('${p._id}')">Delete</button>
+      </td>`;
+    tableBody.appendChild(row);
+  });
+}
+
+function editPatient(id) {
+  fetch(`http://localhost:3000/api/patient/${id}`)
+    .then(res => res.json())
+    .then(p => {
+      document.getElementById("patient-id").value = p._id;
+      document.getElementById("patient-name").value = p.name;
+      document.getElementById("patient-age").value = p.age;
+      document.getElementById("patient-gender").value = p.gender;
+      document.getElementById("patient-contact").value = p.contact;
+    });
+}
+
+async function deletePatient(id) {
+  if (confirm("Are you sure you want to delete this patient?")) {
+    await fetch(`http://localhost:3000/api/patient/${id}`, { method: "DELETE" });
+    loadPatients();
+  }
+}
+
+window.onload = loadPatients;
+
+
+  </script>
+</body>
+</html>

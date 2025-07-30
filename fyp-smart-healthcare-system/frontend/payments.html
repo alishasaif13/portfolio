@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin - Payments</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #e6f0ff;
+      padding: 20px;
+    }
+    .admin-page {
+      max-width: 1100px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #007bff;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background: #007bff;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-page">
+    <h2>All Payments</h2>
+    <table id="payment-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    async function fetchPayments() {
+      try {
+        const res = await fetch("http://localhost:5000/api/payment/all");
+        const data = await res.json();
+
+        const tbody = document.querySelector("#payment-table tbody");
+        tbody.innerHTML = "";
+
+        data.forEach((payment, index) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${payment.name || "-"}</td>
+            <td>${payment.email || "-"}</td>
+            <td>$${(payment.amount / 100).toFixed(2)}</td>
+            <td>${payment.status}</td>
+            <td>${new Date(payment.createdAt).toLocaleString()}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (err) {
+        console.error("Error loading payments:", err);
+        alert("Failed to fetch payments.");
+      }
+    }
+
+    fetchPayments();
+  </script>
+</body>
+</html>

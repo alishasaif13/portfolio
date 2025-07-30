@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Make a Payment - SmartCare</title>
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f8ff;
+      padding: 20px;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0, 123, 255, 0.2);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #007bff;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    #card-element {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-top: 10px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Make a Payment</h2>
+    <form id="payment-form">
+      <input type="text" id="name" placeholder="Full Name" required />
+      <input type="email" id="email" placeholder="Email Address" required />
+      <input type="number" id="amount" placeholder="Amount in USD" required />
+      <div id="card-element"></div>
+      <button type="submit">Pay</button>
+    </form>
+  </div>
+
+  <script type="module">
+  const stripe = Stripe("pk_test_51RfCYj4CO1JgncfVvkW4zdYbuPjILkFsX0qDe5TuzuaFM7g8nqMUIgwTWM0CGIZDXpg5P5d7bBXyZpBDqI7TZo3u00ow5kcq8h");
+  const elements = stripe.elements();
+  const card = elements.create("card");
+  card.mount("#card-element");
+
+  const form = document.getElementById("payment-form");
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const name = document.querySelector("#name").value;
+    const email = document.querySelector("#email").value;
+    const amount = parseFloat(document.querySelector("#amount").value) * 100;
+
+    if (!amount || amount <= 0) {
+      alert("Invalid amount");
+      return;
+    }
+
+    // Step 1: Create payment intent from backend
+    const res = await fetch("http://localhost:5000/api/payment/create-payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount, email }),
+    });
+
+    const data = await res.json();
+    console.log("🎯 Payment intent response:", data);
+
+    if (!data.clientSecret) {
+      alert("Payment creation failed.");
+      return;
+    }
+
+    // Step 2: Confirm payment on Stripe
+    const result = await stripe.confirmCardPayment(data.clientSecret, {
+      payment_method: {
+        card,
+        billing_details: { name, email },
+      },
+    });
+
+    // Step 3: Handle result and save to backend if successful
+    if (result.error) {
+      alert("Payment failed: " + result.error.message);
+    } else if (result.paymentIntent.status === "succeeded") {
+      // ✅ Save payment to your own backend/database
+      await fetch("http://localhost:5000/api/payment/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          amount,
+          status: "succeeded"
+        }),
+      });
+
+      alert("✅ Payment successful! Thank you, " + name + "!");
+      form.reset();
+      card.clear();
+    }
+  });
+</script>
+
+
+</body>
+</html>

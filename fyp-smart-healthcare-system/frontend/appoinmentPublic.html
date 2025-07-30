@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Appointment</title>
+  <style>
+    body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f4f8;
+  margin: 0;
+  padding: 0;
+}
+
+.appointment-container {
+  max-width: 600px;
+  margin: 40px auto;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+.appointment-container h1 {
+  text-align: center;
+  color: #0057b3;
+  margin-bottom: 20px;
+}
+
+#booking-form input,
+#booking-form textarea,
+#booking-form button {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+#booking-form button {
+  background-color: #0057b3;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+#booking-form button:hover {
+  background-color: #004080;
+}
+
+  </style>
+</head>
+<body>
+  <div class="appointment-container">
+    <h1>Book an Appointment</h1>
+    <form id="booking-form">
+      <input type="text" name="name" placeholder="Your Name" required />
+      <input type="email" name="email" placeholder="Your Email" required />
+      <input type="text" name="phone" placeholder="Phone Number" required />
+      <select name="doctor" id="doctor-select" required>
+        <option value="" disabled selected>Select Doctor</option>
+        <!-- JS will fill options here -->
+      </select>
+      <input type="date" name="date" required />
+      <input type="time" name="time" required />
+      <textarea name="message" placeholder="Your Message" rows="4"></textarea>
+
+      <button type="submit">Book Appointment</button>
+    </form>
+  </div>
+  <script src="js/appoinment.js"></script>
+</body>
+</html>
